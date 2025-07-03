@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Test Environment - In Progress</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='testpage.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Pre-Test Setup Modal -->
+    <div class="setup-modal" id="setupModal">
+        <div class="setup-content">
+            <div class="setup-header">
+                <!-- <div class="setup-logo">
+                    <i class="fas fa-shield-alt"></i>
+                </div> -->
+                <h1>SnapTest Environment Setup</h1>
+                <p>Please complete the following steps </p>
+            </div>
+
+            <div class="setup-steps">
+                <div class="step" id="step1">
+                    <div class="step-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <div class="step-content">
+                        <h3>Step 1: Enable Camera</h3>
+                        <p>Click the button below to enable your camera for test monitoring</p>
+                        <button id="enableCameraBtn" class="step-btn">
+                            <i class="fas fa-camera"></i>
+                            Enable Camera
+                        </button>
+                        <div class="step-status" id="cameraStatus">Click to enable camera</div>
+                    </div>
+                </div>
+
+                <div class="step" id="step2">
+                    <div class="step-icon">
+                        <i class="fas fa-expand"></i>
+                    </div>
+                    <div class="step-content">
+                        <h3>Step 2: Enter Full Screen</h3>
+                        <p>Click the button below to enter full-screen mode for security</p>
+                        <button id="enableFullscreenBtn" class="step-btn" disabled>
+                            <i class="fas fa-expand"></i>
+                            Enter Full Screen
+                        </button>
+                        <div class="step-status" id="fullscreenStatus">Camera must be enabled first</div>
+                    </div>
+                </div>
+
+                <div class="step" id="step3">
+                    <div class="step-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="step-content">
+                        <h3>Step 3: Start Test</h3>
+                        <p>Once both camera and full-screen are enabled, you can start your test</p>
+                        <button id="startTestBtn" class="step-btn" disabled>
+                            <i class="fas fa-play"></i>
+                            Start Test
+                        </button>
+                        <div class="step-status" id="readyStatus">Complete steps 1 and 2 first</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setup-actions">
+                <p class="setup-note">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Important:</strong> You must complete all steps to start the test. 
+                    Camera and full-screen mode are required for test security.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Environment -->
+    <div class="test-environment" id="testEnvironment">
+        <!-- Header Bar -->
+        <div class="test-header">
+            <div class="header-left">
+                <div class="test-brand">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>SnapTest Environment</span>
+                </div>
+            </div>
+            
+            <div class="header-center">
+                <div class="student-info">
+                    <i class="fas fa-user"></i>
+                    <span>Student ID: {{ rollno }}</span>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="status-indicators">
+                    <div class="status-item" id="cameraIndicator">
+                        <i class="fas fa-camera"></i>
+                        <span>Camera</span>
+                    </div>
+                    <div class="status-item" id="fullscreenIndicator">
+                        <i class="fas fa-expand"></i>
+                        <span>Full Screen</span>
+                    </div>
+                    <div class="status-item warning" id="exitCounter">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Exits: <span id="exitCount">0</span>/3</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Warning Banner -->
+        <div class="security-banner" id="securityBanner">
+            <div class="banner-content">
+                <i class="fas fa-shield-alt"></i>
+                <span>SECURITY ACTIVE: Do not close this tab, navigate away, or exit full-screen mode. Camera monitoring is active.</span>
+            </div>
+        </div>
+
+        <!-- Main Test Content -->
+        <div class="test-main">
+            <div class="test-container">
+                <div class="test-header-section">
+                    <h1><i class="fas fa-file-alt"></i> Weekly Test</h1>
+                    <div class="test-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Time: <span id="testTimer">00:00:00</span></span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Questions: <span id="questionCount">{{ data|length }}</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="test-instructions">
+                    <div class="instructions-header">
+                        <i class="fas fa-info-circle"></i>
+                        <h3>Test Instructions</h3>
+                    </div>
+                    <div class="instructions-content">
+                        <ul>
+                            <li><i class="fas fa-check"></i> Read each question carefully before answering</li>
+                            <li><i class="fas fa-check"></i> Do not close this browser tab or navigate away</li>
+                            <li><i class="fas fa-check"></i> Ensure your camera is working and visible</li>
+                            <li><i class="fas fa-check"></i> You have <strong>3 warnings</strong> before automatic submission</li>
+                            <li><i class="fas fa-check"></i> Click "Submit Test" when you have completed all questions</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Test Questions -->
+                <div class="test-questions">
+                    <div class="questions-header">
+                        <h3><i class="fas fa-list"></i> Test Questions</h3>
+                    </div>
+                    <div class="questions-container">
+                        {% for row in data %}
+                        <div class="question-item">
+                            <div class="question-number">Question {{ loop.index }}</div>
+                            <div class="question-content">
+                                <img src="{{ row }}" alt="Test Question {{ loop.index }}" class="question-image">
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Submit Section -->
+                <div class="submit-section">
+                    <div class="submit-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Make sure you have answered all questions before submitting</span>
+                    </div>
+                    <form action="/testpage1" method="POST" id="submitForm">
+                        <input type="hidden" id="exitCountInput" name="exitcount" value="{{ rollno }}">
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <i class="fas fa-paper-plane"></i>
+                            Submit Test
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Camera Preview -->
+        <div class="camera-preview" id="cameraPreview">
+            <div class="camera-header">
+                <i class="fas fa-video"></i>
+                <span>Live Camera Feed</span>
+            </div>
+            <div class="camera-container">
+                <video id="testCamera" autoplay muted playsinline></video>
+                <div class="camera-overlay">
+                    <div class="camera-status" id="cameraStatusText">Camera Active</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden form for automatic submission -->
+    <form id="autoSubmitForm" action="/testpage" method="POST" style="display: none;">
+        <input type="hidden" name="exitcount" value="{{ rollno }}">
+    </form>
+
+    <script>
+        // Global variables
+        let exitCount = 0;
+        let stream = null;
+        let fullscreenCheckInterval;
+        let cameraCheckInterval;
+        let testTimer;
+        let startTime;
+        let isTestActive = false;
+        let cameraEnabled = false;
+        let fullscreenEnabled = false;
+        let isSubmitting = false; // Flag to prevent blur events during submission
+        var rollno = "{{ rollno }}";
+        
+
+        // Initialize when page loads
+        window.addEventListener('load', function() {
+            // Security check: Block re-entry if test is already completed
+            fetch(`/check_status/{{ rollno }}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'Correct Submission' || data.status === 'Exit Count Exceeded') {
+                        alert('This test has already been completed. You will be returned to the home page.');
+                        window.location.href = '/';
+                    } else {
+                        // Show setup modal
+                        document.getElementById('setupModal').style.display = 'flex';
+                        document.getElementById('testEnvironment').style.display = 'none';
+                        setupEventListeners();
+                    }
+                })
+                .catch(error => {
+                    console.error('Status check failed:', error);
+                    // Proceed with test anyway
+                    document.getElementById('setupModal').style.display = 'flex';
+                    document.getElementById('testEnvironment').style.display = 'none';
+                    setupEventListeners();
+                });
+        });
+
+        function setupEventListeners() {
+            // Camera enable button
+            document.getElementById('enableCameraBtn').addEventListener('click', enableCamera);
+            
+            // Fullscreen enable button
+            document.getElementById('enableFullscreenBtn').addEventListener('click', enableFullscreen);
+            
+            // Start test button
+            document.getElementById('startTestBtn').addEventListener('click', startTest);
+            
+            // Submit form
+            document.getElementById('submitForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (confirm('Are you sure you want to submit your test? This action cannot be undone.')) {
+                    isSubmitting = true; // Set flag to prevent blur events
+                    // Use the hidden auto-submit form instead to avoid event loop
+                    document.getElementById('autoSubmitForm').submit();
+                }
+            });
+        }
+
+        // Camera Management
+        async function enableCamera() {
+            const button = document.getElementById('enableCameraBtn');
+            const status = document.getElementById('cameraStatus');
+            const video = document.getElementById('testCamera');
+            
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enabling...';
+            button.disabled = true;
+            status.textContent = 'Requesting camera access...';
+
+            try {
+                // Stop any existing stream
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+
+                // Request new camera access
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 640, min: 320 },
+                        height: { ideal: 480, min: 240 },
+                        facingMode: 'user'
+                    },
+                    audio: false
+                });
+
+                console.log('Camera access granted, setting up video...');
+                
+                // Set video source
+                video.srcObject = stream;
+                
+                // Wait for video to load and play
+                await new Promise((resolve, reject) => {
+                    video.onloadedmetadata = () => {
+                        video.play().then(() => {
+                            console.log('Camera video started playing successfully');
+                            resolve();
+                        }).catch(reject);
+                    };
+                    video.onerror = reject;
+                });
+
+                // Success - update UI
+                cameraEnabled = true;
+                updateCameraStatus(true);
+                updateStepStatus('step1', 'success', 'Camera enabled successfully');
+                
+                // Enable fullscreen button
+                document.getElementById('enableFullscreenBtn').disabled = false;
+                document.getElementById('fullscreenStatus').textContent = 'Click to enable full screen';
+                
+                checkReadyState();
+
+            } catch (err) {
+                console.error('Camera access error:', err);
+                updateCameraStatus(false);
+                updateStepStatus('step1', 'error', 'Camera access denied. Please allow camera access and try again.');
+                
+                // Reset button
+                button.innerHTML = '<i class="fas fa-camera"></i> Enable Camera';
+                button.disabled = false;
+                status.textContent = 'Camera access denied. Click to try again.';
+            }
+        }
+
+        // Full Screen Management
+        function enableFullscreen() {
+            const button = document.getElementById('enableFullscreenBtn');
+            const status = document.getElementById('fullscreenStatus');
+            
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enabling...';
+            button.disabled = true;
+            status.textContent = 'Requesting full screen...';
+
+            const elem = document.documentElement;
+            
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) {
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+
+            // Check if fullscreen was successful after a short delay
+            setTimeout(() => {
+                if (document.fullscreenElement) {
+                    fullscreenEnabled = true;
+                    updateFullScreenStatus(true);
+                    updateStepStatus('step2', 'success', 'Full screen enabled successfully');
+                    checkReadyState();
+                } else {
+                    updateStepStatus('step2', 'error', 'Full screen request failed. Please try again.');
+                    button.innerHTML = '<i class="fas fa-expand"></i> Enter Full Screen';
+                    button.disabled = false;
+                    status.textContent = 'Full screen failed. Click to try again.';
+                }
+            }, 1000);
+        }
+
+        // Start Test
+        function startTest() {
+            if (!cameraEnabled || !fullscreenEnabled) {
+                alert('Please enable both camera and full screen mode before starting the test.');
+                return;
+            }
+
+            // Ensure camera preview is visible
+            const cameraPreview = document.getElementById('cameraPreview');
+            const video = document.getElementById('testCamera');
+            
+            // Make sure camera preview is displayed
+            cameraPreview.style.display = 'flex';
+            
+            // Ensure video is playing
+            if (stream && stream.active) {
+                video.play().then(() => {
+                    console.log('Camera video confirmed playing during test start');
+                }).catch(err => {
+                    console.error('Camera video play error during test start:', err);
+                });
+            }
+
+            // Set up monitoring and event listeners
+            setupMonitoring();
+            setupTestEventListeners();
+            
+            // Start test timer
+            startTestTimer();
+            
+            // Show test environment
+            document.getElementById('setupModal').style.display = 'none';
+            document.getElementById('testEnvironment').style.display = 'block';
+            
+            isTestActive = true;
+        }
+
+        // Check if both camera and fullscreen are ready
+        function checkReadyState() {
+            if (cameraEnabled && fullscreenEnabled) {
+                document.getElementById('startTestBtn').disabled = false;
+                document.getElementById('readyStatus').textContent = 'Ready to start test!';
+                updateStepStatus('step3', 'success', 'All requirements met');
+            }
+        }
+
+        // Update step status
+        function updateStepStatus(stepId, status, message) {
+            const step = document.getElementById(stepId);
+            const statusElement = step.querySelector('.step-status');
+            
+            step.className = `step ${status}`;
+            statusElement.textContent = message;
+            
+            if (status === 'success') {
+                step.querySelector('.step-icon i').className = 'fas fa-check-circle';
+            }
+        }
+
+        // Camera status update
+        function updateCameraStatus(isActive) {
+            const indicator = document.getElementById('cameraIndicator');
+            const statusText = document.getElementById('cameraStatusText');
+            
+            if (isActive) {
+                indicator.className = 'status-item active';
+                statusText.textContent = 'Camera Active';
+                statusText.className = 'camera-status active';
+                console.log('Camera status: Active');
+            } else {
+                indicator.className = 'status-item error';
+                statusText.textContent = 'Camera Inactive';
+                statusText.className = 'camera-status error';
+                console.log('Camera status: Inactive');
+            }
+        }
+
+        // Full screen status update
+        function updateFullScreenStatus(isActive) {
+            const indicator = document.getElementById('fullscreenIndicator');
+            
+            if (isActive) {
+                indicator.className = 'status-item active';
+                indicator.innerHTML = '<i class="fas fa-expand"></i><span>Full Screen</span>';
+                indicator.style.animation = 'none'; // Remove pulsing animation
+            } else {
+                indicator.className = 'status-item error';
+                indicator.innerHTML = '<i class="fas fa-compress"></i><span>Full Screen</span>';
+                // Add pulsing animation for inactive fullscreen
+                indicator.style.animation = 'pulse 1s infinite';
+            }
+        }
+
+        // Test timer
+        function startTestTimer() {
+            startTime = Date.now();
+            testTimer = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            const elapsed = Date.now() - startTime;
+            const hours = Math.floor(elapsed / 3600000);
+            const minutes = Math.floor((elapsed % 3600000) / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            
+            document.getElementById('testTimer').textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Monitoring setup
+        function setupMonitoring() {
+            // Monitor full screen every 1 second
+            fullscreenCheckInterval = setInterval(() => {
+                const isFullScreen = !!document.fullscreenElement;
+                updateFullScreenStatus(isFullScreen);
+            }, 1000);
+
+            // Monitor camera every 2 seconds
+            let cameraFailureCount = 0;
+
+cameraCheckInterval = setInterval(() => {
+    if (stream && stream.active) {
+        const track = stream.getVideoTracks()[0];
+        if (track && track.readyState === 'live') {
+            updateCameraStatus(true);
+            cameraFailureCount = 0;
+        } else {
+            cameraFailureCount++;
+            updateCameraStatus(false);
+        }
+    } else {
+        cameraFailureCount++;
+        updateCameraStatus(false);
+    }
+
+    if (cameraFailureCount >= 3) {
+        showSecurityAlert('Camera feed lost. Submitting test for violation.');
+        setTimeout(() => {
+            document.getElementById('submitForm').submit();
+        }, 2000);
+    }
+}, 2000);
+        }
+
+        // Test event listeners
+        function setupTestEventListeners() {
+            // Full screen change events
+            document.addEventListener('fullscreenchange', handleFullScreenChange);
+            document.addEventListener('mozfullscreenchange', handleFullScreenChange);
+            document.addEventListener('webkitfullscreenchange', handleFullScreenChange);
+            document.addEventListener('msfullscreenchange', handleFullScreenChange);
+
+            // Prevent context menu
+            document.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                showSecurityAlert('Right-click is disabled during the test.');
+            });
+
+            // Prevent keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'F11' || e.key === 'F5' || 
+                    (e.ctrlKey && (e.key === 'r' || e.key === 'R' || e.key === 'w' || e.key === 'W')) ||
+                    (e.altKey && e.key === 'F4')) {
+                    e.preventDefault();
+                    showSecurityAlert('This keyboard shortcut is disabled during the test.');
+                }
+            });
+
+            // Prevent page unload
+            window.addEventListener('beforeunload', (e) => {
+                if (isTestActive) {
+                    e.preventDefault();
+                    e.returnValue = 'Are you sure you want to leave? Your test will be submitted.';
+                }
+            });
+        }
+
+        // Handle full screen change
+        function handleFullScreenChange() {
+            const isFullScreen = !!document.fullscreenElement;
+            updateFullScreenStatus(isFullScreen);
+            
+            if (!isFullScreen && isTestActive) {
+                // Clear any existing restoration interval when exiting fullscreen
+                if (fullscreenRestoreInterval) {
+                    clearInterval(fullscreenRestoreInterval);
+                    fullscreenRestoreInterval = null;
+                }
+                incrementExitCount('You exited full screen!');
+            } else if (isFullScreen && isTestActive && fullscreenRestoreInterval) {
+                // User manually restored fullscreen, stop automatic attempts
+                console.log('Fullscreen manually restored by user');
+                clearInterval(fullscreenRestoreInterval);
+                fullscreenRestoreInterval = null;
+                showSecurityAlert('Full screen mode restored! Test security active.');
+            }
+        }
+
+        // Tab/window switch event
+        window.addEventListener('blur', function() {
+            if (isTestActive && !isSubmitting) {
+                // Add a small delay to prevent false triggers from button clicks
+                setTimeout(() => {
+                    if (isTestActive && !isSubmitting && !document.hasFocus()) {
+                        incrementExitCount('You switched tabs or windows!');
+                    }
+                }, 100);
+            }
+        });
+
+        // Global variable to track fullscreen restoration attempts
+        let fullscreenRestoreAttempts = 0;
+        let fullscreenRestoreInterval = null;
+
+        function incrementExitCount(reason) {
+            fetch('/increment_exit_count', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'rollno=' + encodeURIComponent(rollno)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.exit_count !== undefined) {
+                    document.getElementById('exitCount').textContent = data.exit_count;
+                }
+                if (data.blocked) {
+                    alert('You have violated the test security policy too many times. You are disqualified.');
+                    window.location.href = '/studentlogin';
+                } else if (data.exit_count !== undefined) {
+                    showSecurityAlert(`Warning: ${reason} Exit count: ${data.exit_count}/3`);
+                    
+                    // Only try to force full screen again if the reason was fullscreen exit
+                    if (reason.includes('full screen')) {
+                        console.log(`Starting fullscreen restoration for exit count: ${data.exit_count}`);
+                        
+                        // Clear any existing restoration interval
+                        if (fullscreenRestoreInterval) {
+                            clearInterval(fullscreenRestoreInterval);
+                            fullscreenRestoreInterval = null;
+                        }
+                        
+                        fullscreenRestoreAttempts = 0;
+                        startFullscreenRestoration();
+                    }
+                } else {
+                    alert('Error: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(err => {
+                console.error('Error communicating with server:', err);
+                alert('Error communicating with server. Please try again.');
+            });
+        }
+
+        // Function to automatically restore fullscreen with multiple attempts
+        function startFullscreenRestoration() {
+            // First attempt after 1 second
+            setTimeout(() => {
+                attemptFullscreenRestoration();
+            }, 1000);
+
+            // Continue trying every 3 seconds indefinitely until fullscreen is restored
+            fullscreenRestoreInterval = setInterval(() => {
+                if (document.fullscreenElement || !isTestActive) {
+                    // Fullscreen restored or test ended, stop trying
+                    clearInterval(fullscreenRestoreInterval);
+                    fullscreenRestoreInterval = null;
+                    fullscreenRestoreAttempts = 0; // Reset attempts counter
+                    return;
+                }
+                attemptFullscreenRestoration();
+            }, 3000);
+        }
+
+        // Function to attempt fullscreen restoration
+        function attemptFullscreenRestoration() {
+            if (!isTestActive || document.fullscreenElement) {
+                return;
+            }
+
+            fullscreenRestoreAttempts++;
+            console.log(`Attempting fullscreen restoration (attempt ${fullscreenRestoreAttempts})`);
+
+            const elem = document.documentElement;
+            let fullscreenPromise = null;
+
+            if (elem.requestFullscreen) {
+                fullscreenPromise = elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) {
+                fullscreenPromise = elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) {
+                fullscreenPromise = elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                fullscreenPromise = elem.msRequestFullscreen();
+            }
+
+            if (fullscreenPromise) {
+                fullscreenPromise
+                    .then(() => {
+                        console.log('Fullscreen restored successfully!');
+                        showSecurityAlert('Full screen mode restored automatically!');
+                        clearInterval(fullscreenRestoreInterval);
+                        fullscreenRestoreInterval = null;
+                        fullscreenRestoreAttempts = 0; // Reset attempts counter
+                    })
+                    .catch(err => {
+                        console.log(`Fullscreen restoration attempt ${fullscreenRestoreAttempts} failed:`, err);
+                        
+                        // Show progress message after a few attempts
+                        if (fullscreenRestoreAttempts >= 3 && fullscreenRestoreAttempts < 10) {
+                            showSecurityAlert(`Attempting to restore full screen... (Attempt ${fullscreenRestoreAttempts})`);
+                        }
+                        // After 10 attempts, auto-submit the test
+                        if (fullscreenRestoreAttempts >= 10) {
+                            clearInterval(fullscreenRestoreInterval);
+                            fullscreenRestoreInterval = null;
+                            showSecurityAlert('You did not return to full screen. Your test will be auto-submitted.');
+                            setTimeout(() => {
+                                document.getElementById('autoSubmitForm').submit();
+                            }, 2000);
+                        }
+                    });
+            }
+        }
+
+        // Show security alert
+        function showSecurityAlert(message) {
+            const alert = document.createElement('div');
+            alert.className = 'security-alert';
+            
+            // Add special styling for fullscreen exit warnings
+            if (message.includes('full screen')) {
+                alert.className = 'security-alert fullscreen-warning';
+                alert.innerHTML = `
+                    <i class="fas fa-expand"></i>
+                    <div class="alert-content">
+                        <strong>Full Screen Required!</strong>
+                        <span>${message}</span>
+                        <small>Full screen mode will be restored automatically.</small>
+                    </div>
+                `;
+            } else {
+                alert.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>${message}</span>
+                `;
+            }
+            
+            document.body.appendChild(alert);
+            
+            // Keep fullscreen warnings visible longer
+            const duration = message.includes('full screen') ? 5000 : 3000;
+            setTimeout(() => {
+                alert.remove();
+            }, duration);
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('unload', function() {
+            if (fullscreenCheckInterval) clearInterval(fullscreenCheckInterval);
+            if (cameraCheckInterval) clearInterval(cameraCheckInterval);
+            if (testTimer) clearInterval(testTimer);
+            if (fullscreenRestoreInterval) clearInterval(fullscreenRestoreInterval);
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            isSubmitting = false;
+        });
+
+        // Show a button if not in fullscreen
+        if (!document.fullscreenElement) {
+            document.getElementById('fullscreenBtn').style.display = 'block';
+        }
+        document.getElementById('fullscreenBtn').onclick = function() {
+            document.documentElement.requestFullscreen();
+            this.style.display = 'none';
+        };
+    </script>
+</body>
+</html>

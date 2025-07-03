@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Content Management - Secure Test System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='adminpage.css') }}">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logout-section">
+                <a href="{{ url_for('landing') }}" class="logout-btn">
+                    <i class="fas fa-home"></i>
+                    Back to Home
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('admindashboard') }}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a></li>
+                <li><a href="{{ url_for('testcontent') }}" class="active">
+                    <i class="fas fa-edit"></i> Test Content
+                </a></li>
+                <li><a href="{{ url_for('showstudentsdata') }}">
+                    <i class="fas fa-users"></i> Student Data
+                </a></li>
+                <li><a href="{{ url_for('download_excel') }}">
+                    <i class="fas fa-download"></i> Export Data
+                </a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1><i class="fas fa-edit"></i> Test Content Management</h1>
+                <p>Upload and manage test questions and content for students</p>
+            </div>
+
+            <!-- Content Form -->
+            <div class="dashboard-grid">
+                <div class="card" style="grid-column: 1 / -1;">
+                    <h3>
+                        <div class="card-icon">📝</div>
+                        Upload Test Content
+                    </h3>
+                    <p>Add image URLs for test questions. Each URL should be on a separate line.</p>
+                    
+                    <form action="/taketestcontent" method="POST" id="testContentForm">
+                        <div class="form-group">
+                            <label for="content">
+                                <i class="fas fa-image"></i>
+                                Image URLs (one URL per line)
+                            </label>
+                            <textarea 
+                                id="content" 
+                                name="content" 
+                                placeholder="Enter image URLs for test questions...&#10;Example:&#10;https://i.imgur.com/question1.png&#10;https://i.imgur.com/question2.png&#10;https://i.imgur.com/question3.png" 
+                                required
+                                rows="10"
+                            ></textarea>
+                            <div class="form-help">
+                                <i class="fas fa-info-circle"></i>
+                                Supported formats: PNG, JPG, JPEG, GIF. Maximum 50 questions per test.
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-success" id="submitBtn">
+                                <i class="fas fa-upload"></i>
+                                Upload Content
+                            </button>
+                            <a href="/admindashboard" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Success/Error Messages -->
+                    {% if x %}
+                    <div class="message {{ 'success' if 'successfully' in x.lower() else 'error' }}">
+                        <i class="fas fa-{{ 'check-circle' if 'successfully' in x.lower() else 'exclamation-triangle' }}"></i>
+                        {{ x }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Instructions Card -->
+                <div class="card">
+                    <h3>
+                        <div class="card-icon">📋</div>
+                        Instructions
+                    </h3>
+                    <ul class="instructions-list">
+                        <li><i class="fas fa-check"></i> One image URL per line</li>
+                        <li><i class="fas fa-check"></i> Use high-quality images</li>
+                        <li><i class="fas fa-check"></i> Ensure URLs are accessible</li>
+                        <li><i class="fas fa-check"></i> Test images before uploading</li>
+                    </ul>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card">
+                    <h3>
+                        <div class="card-icon">⚡</div>
+                        Quick Actions
+                    </h3>
+                    <p>Manage your test content efficiently</p>
+                    <div class="quick-actions">
+                        <button class="btn btn-warning" onclick="clearContent()">
+                            <i class="fas fa-eraser"></i>
+                            Clear Form
+                        </button>
+                        <button class="btn btn-info" onclick="validateURLs()">
+                            <i class="fas fa-check"></i>
+                            Validate URLs
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back to Dashboard -->
+            <div class="logout-section">
+                <a href="/admindashboard" class="logout-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Navigation Toggle -->
+    <button class="nav-toggle" id="navToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Include Admin JavaScript -->
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.getElementById('navToggle');
+            const sidebar = document.querySelector('.sidebar');
+            const form = document.getElementById('testContentForm');
+            const textarea = document.getElementById('content');
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Mobile navigation toggle
+            navToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('mobile-open');
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.sidebar') && !e.target.closest('.nav-toggle')) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            });
+
+            // Form submission with loading state
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // Validate content
+                const content = textarea.value.trim();
+                if (!content) {
+                    showNotification('Please enter some content before submitting.', 'error');
+                    return;
+                }
+
+                // Count URLs
+                const urls = content.split('\n').filter(url => url.trim());
+                if (urls.length > 50) {
+                    showNotification('Maximum 50 questions allowed per test.', 'error');
+                    return;
+                }
+
+                // Show loading state
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+                submitBtn.disabled = true;
+
+                // Submit form after delay
+                setTimeout(() => {
+                    form.submit();
+                }, 1500);
+            });
+
+            // Auto-resize textarea
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 400) + 'px';
+            });
+
+            // Add character counter
+            textarea.addEventListener('input', function() {
+                const lines = this.value.split('\n').length;
+                const charCount = this.value.length;
+                
+                // Update counter if it exists
+                let counter = document.getElementById('charCounter');
+                if (!counter) {
+                    counter = document.createElement('div');
+                    counter.id = 'charCounter';
+                    counter.className = 'char-counter';
+                    this.parentNode.appendChild(counter);
+                }
+                
+                counter.textContent = `${lines} lines, ${charCount} characters`;
+            });
+
+            // Add page load animation
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.5s ease-in-out';
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+
+        // Clear content function
+        function clearContent() {
+            if (confirm('Are you sure you want to clear all content?')) {
+                document.getElementById('content').value = '';
+                showNotification('Content cleared successfully.', 'info');
+            }
+        }
+
+        // Validate URLs function
+        function validateURLs() {
+            const content = document.getElementById('content').value;
+            const urls = content.split('\n').filter(url => url.trim());
+            
+            if (urls.length === 0) {
+                showNotification('No URLs to validate.', 'error');
+                return;
+            }
+
+            let validCount = 0;
+            let invalidCount = 0;
+
+            urls.forEach(url => {
+                try {
+                    new URL(url);
+                    validCount++;
+                } catch {
+                    invalidCount++;
+                }
+            });
+
+            showNotification(`${validCount} valid URLs, ${invalidCount} invalid URLs found.`, 'info');
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Add CSS for form elements
+        const style = document.createElement('style');
+        style.textContent = `
+            .form-group {
+                margin-bottom: 25px;
+            }
+
+            .form-group label {
+                display: block;
+                color: white;
+                margin-bottom: 10px;
+                font-weight: 500;
+                font-size: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .form-group textarea {
+                width: 100%;
+                padding: 15px;
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                border-radius: 12px;
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+                font-size: 1rem;
+                font-family: inherit;
+                resize: vertical;
+                min-height: 200px;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+            }
+
+            .form-group textarea::placeholder {
+                color: rgba(255, 255, 255, 0.6);
+            }
+
+            .form-group textarea:focus {
+                outline: none;
+                border-color: var(--primary-orange);
+                background: rgba(255, 255, 255, 0.15);
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            }
+
+            .form-help {
+                margin-top: 8px;
+                font-size: 0.9rem;
+                color: rgba(255, 255, 255, 0.7);
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .form-actions {
+                display: flex;
+                gap: 15px;
+                margin-top: 25px;
+                flex-wrap: wrap;
+            }
+
+            .btn-secondary {
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .btn-secondary:hover {
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            .instructions-list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .instructions-list li {
+                padding: 8px 0;
+                color: rgba(255, 255, 255, 0.8);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .instructions-list li i {
+                color: var(--success-green);
+                font-size: 0.9rem;
+            }
+
+            .quick-actions {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .btn-info {
+                background: linear-gradient(45deg, var(--info-blue), #20c997);
+                color: white;
+            }
+
+            .char-counter {
+                margin-top: 8px;
+                font-size: 0.8rem;
+                color: rgba(255, 255, 255, 0.6);
+                text-align: right;
+            }
+
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: white;
+                color: #333;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                z-index: 10000;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            }
+
+            .notification.show {
+                transform: translateX(0);
+            }
+
+            .notification.error {
+                border-left: 4px solid var(--primary-red);
+            }
+
+            .notification.success {
+                border-left: 4px solid var(--success-green);
+            }
+
+            .notification.info {
+                border-left: 4px solid var(--info-blue);
+            }
+
+            @media (max-width: 768px) {
+                .form-actions {
+                    flex-direction: column;
+                }
+                
+                .quick-actions {
+                    flex-direction: column;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html> 

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Data - Secure Test System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='adminpage.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logout-section">
+                <a href="{{ url_for('landing') }}" class="logout-btn">
+                    <i class="fas fa-home"></i>
+                    Back to Home
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('admindashboard') }}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a></li>
+                <li><a href="{{ url_for('testcontent') }}">
+                    <i class="fas fa-edit"></i> Test Content
+                </a></li>
+                <li><a href="{{ url_for('showstudentsdata') }}" class="active">
+                    <i class="fas fa-users"></i> Student Data
+                </a></li>
+                <li><a href="{{ url_for('download_excel') }}">
+                    <i class="fas fa-download"></i> Export Data
+                </a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1><i class="fas fa-users"></i> Student Data Management</h1>
+                <p>View and manage all registered students and their test status</p>
+            </div>
+
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">{{ data|length }}</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ data|selectattr('3', 'equalto', 'Correct Submission')|list|length }}</div>
+                    <div class="stat-label">Completed Tests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ data|selectattr('3', 'equalto', 'Registered')|list|length }}</div>
+                    <div class="stat-label">Registered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ data|selectattr('3', 'equalto', 'Exit Count Exceeded')|list|length }}</div>
+                    <div class="stat-label">Disqualified</div>
+                </div>
+            </div>
+
+            <!-- Search and Filter Controls -->
+            <div class="table-controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search students by name, roll number, or batch...">
+                </div>
+                <select class="filter-select" id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="Correct Submission">Completed</option>
+                    <option value="Registered">Registered</option>
+                    <option value="Exit Count Exceeded">Disqualified</option>
+                </select>
+            </div>
+
+            <!-- Data Table -->
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-id-card"></i> Roll Number</th>
+                            <th><i class="fas fa-user"></i> Name</th>
+                            <th><i class="fas fa-graduation-cap"></i> Batch</th>
+                            <th><i class="fas fa-info-circle"></i> Status</th>
+                            <!-- <th><i class="fas fa-phone"></i> Mobile</th> -->
+                            <th><i class="fas fa-cogs"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                            <tr data-rollno="{{ row[0] }}">
+                                <td><strong>{{ row[0] }}</strong></td>
+                                <td>{{ row[1] }}</td>
+                                <td>{{ row[2] }}</td>
+                                <!-- <td>{{ row[4] if row|length > 4 else 'N/A' }}</td> -->
+                                <td>
+                                    <span class="status-badge 
+                                        {% if row[3] == 'Correct Submission' %}status-correct
+                                        {% elif row[3] == 'Exit Count Exceeded' %}status-exit
+                                        {% else %}status-registered{% endif %}">
+                                        {% if row[3] == 'Correct Submission' %}
+                                            <i class="fas fa-check-circle"></i>
+                                        {% elif row[3] == 'Exit Count Exceeded' %}
+                                            <i class="fas fa-times-circle"></i>
+                                        {% else %}
+                                            <i class="fas fa-clock"></i>
+                                        {% endif %}
+                                        {{ row[3] }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-danger btn-sm delete-btn" 
+                                            data-rollno="{{ row[0] }}" 
+                                            data-name="{{ row[1] }}">
+                                        <i class="fas fa-trash"></i>
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="dashboard-grid" style="margin-top: 30px;">
+                <div class="card">
+                    <h3>
+                        <div class="card-icon">📊</div>
+                        Export Data
+                    </h3>
+                    <p>Download all student data as an Excel file for analysis and reporting.</p>
+                    <a href="/download-excel" class="btn btn-success">
+                        <i class="fas fa-file-excel"></i>
+                        Download Excel
+                    </a>
+                </div>
+
+                <div class="card">
+                    <h3>
+                        <div class="card-icon">🔄</div>
+                        Refresh Data
+                    </h3>
+                    <p>Refresh the student data to see the latest updates and changes.</p>
+                    <button onclick="location.reload()" class="btn btn-success">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Back to Dashboard -->
+            <div class="logout-section">
+                <a href="/admindashboard" class="logout-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Navigation Toggle -->
+    <button class="nav-toggle" id="navToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Success/Error Notification -->
+    <div id="notification" class="notification" style="display: none;">
+        <div class="notification-content">
+            <i id="notificationIcon"></i>
+            <span id="notificationText"></span>
+        </div>
+    </div>
+
+    <!-- Include Admin JavaScript -->
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.getElementById('navToggle');
+            const sidebar = document.querySelector('.sidebar');
+            const searchInput = document.getElementById('searchInput');
+            const statusFilter = document.getElementById('statusFilter');
+            const tableRows = document.querySelectorAll('tbody tr');
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+
+            // Mobile navigation toggle
+            navToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('mobile-open');
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.sidebar') && !e.target.closest('.nav-toggle')) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            });
+
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                filterTable();
+            });
+
+            // Status filter functionality
+            statusFilter.addEventListener('change', function() {
+                filterTable();
+            });
+
+            function filterTable() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const statusFilterValue = statusFilter.value;
+
+                tableRows.forEach(row => {
+                    const rollNumber = row.cells[0].textContent.toLowerCase();
+                    const name = row.cells[1].textContent.toLowerCase();
+                    const batch = row.cells[2].textContent.toLowerCase();
+                    const status = row.cells[4].textContent;
+
+                    const matchesSearch = rollNumber.includes(searchTerm) || 
+                                        name.includes(searchTerm) || 
+                                        batch.includes(searchTerm);
+                    
+                    const matchesStatus = !statusFilterValue || status.includes(statusFilterValue);
+
+                    if (matchesSearch && matchesStatus) {
+                        row.style.display = '';
+                        row.style.animation = 'fadeIn 0.3s ease-in';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+
+            deleteButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault(); // Prevent form submission if inside a form
+                    const rollno = this.getAttribute('data-rollno');
+                    const name = this.getAttribute('data-name');
+                    const originalContent = this.innerHTML;
+                    const button = this;
+
+                    if (confirm(`Are you sure you want to delete student ${name} (${rollno})? This action cannot be undone.`)) {
+                        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                        button.disabled = true;
+                        console.log('About to send fetch for', rollno);
+                        // Prepare form data
+                        const formData = new FormData();
+                        formData.append('rollno', rollno);
+                        fetch('/deletestudent', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                return response.json();
+                            } else {
+                                throw new Error('Network response was not ok');
+                            }
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                // Remove the row from the table
+                                const row = button.closest('tr');
+                                row.style.animation = 'fadeOut 0.3s ease-out';
+                                setTimeout(() => {
+                                    row.remove();
+                                    updateStatistics();
+                                }, 300);
+                            } else {
+                                alert(data.message || 'Delete failed.');
+                                button.innerHTML = originalContent;
+                                button.disabled = false;
+                            }
+                        })
+                        .catch(error => {
+                            alert('Error deleting student. Please try again.');
+                            button.innerHTML = originalContent;
+                            button.disabled = false;
+                        });
+                    }
+                });
+            });
+
+            function updateStatistics() {
+                const totalStudents = document.querySelectorAll('tbody tr').length;
+                const completedTests = document.querySelectorAll('.status-correct').length;
+                const registered = document.querySelectorAll('.status-registered').length;
+                const disqualified = document.querySelectorAll('.status-exit').length;
+
+                // Update statistics cards
+                const statCards = document.querySelectorAll('.stat-card .stat-number');
+                if (statCards.length >= 4) {
+                    statCards[0].textContent = totalStudents;
+                    statCards[1].textContent = completedTests;
+                    statCards[2].textContent = registered;
+                    statCards[3].textContent = disqualified;
+                }
+            }
+
+            function showNotification(message, type) {
+                const notification = document.getElementById('notification');
+                const notificationIcon = document.getElementById('notificationIcon');
+                const notificationText = document.getElementById('notificationText');
+
+                notificationIcon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+                notificationText.textContent = message;
+                notification.className = `notification ${type}`;
+                notification.style.display = 'block';
+
+                // Hide notification after 3 seconds
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            }
+
+            // Add hover effects to table rows
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.01)';
+                    this.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+                });
+
+                row.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+
+            // Add click effects to buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+
+            // Add page load animation
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.5s ease-in-out';
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+
+        // Add CSS for status badges, animations, and notifications
+        const style2 = document.createElement('style');
+        style2.textContent = `
+            .status-badge {
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 500;
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .status-correct {
+                background: rgba(40, 167, 69, 0.2);
+                color: #51cf66;
+                border: 1px solid rgba(40, 167, 69, 0.3);
+            }
+
+            .status-exit {
+                background: rgba(220, 53, 69, 0.2);
+                color: #ff6b6b;
+                border: 1px solid rgba(220, 53, 69, 0.3);
+            }
+
+            .status-registered {
+                background: rgba(255, 193, 7, 0.2);
+                color: #ffd43b;
+                border: 1px solid rgba(255, 193, 7, 0.3);
+            }
+
+            .btn-sm {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 10px;
+                color: white;
+                font-weight: 600;
+                z-index: 10000;
+                animation: slideInRight 0.3s ease-out;
+            }
+
+            .notification.success {
+                background: linear-gradient(135deg, #28a745, #20c997);
+            }
+
+            .notification.error {
+                background: linear-gradient(135deg, #dc3545, #e74c3c);
+            }
+
+            .notification-content {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(-10px); }
+            }
+
+            .data-table {
+                margin-bottom: 30px;
+            }
+
+            .data-table table {
+                width: 100%;
+                border-collapse: collapse;
+                color: white;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 15px;
+                text-align: left;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .data-table th {
+                background: rgba(255, 255, 255, 0.1);
+                font-weight: 600;
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .data-table tr:hover {
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            .data-table tr:last-child td {
+                border-bottom: none;
+            }
+
+            .logo-text {
+                display: flex;
+                align-items: center;
+                color: white;
+                font-size: 1.3em;
+                font-weight: 700;
+                gap: 10px;
+            }
+
+            .logo-text i {
+                font-size: 1.5em;
+                color: #f37021;
+            }
+        `;
+        document.head.appendChild(style2);
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+/* Show Students Data Dedicated Styles */
+body {
+    background: linear-gradient(135deg, #1e2a78, #f37021);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.data-header {
+    background: rgba(255,255,255,0.1);
+    padding: 30px 0 20px 0;
+    text-align: center;
+    color: #fff;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+.data-table-container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: rgba(255,255,255,0.08);
+    border-radius: 15px;
+    padding: 30px 20px;
+    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.17);
+}
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #fff;
+    font-size: 1rem;
+}
+.data-table th, .data-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    text-align: center;
+}
+.data-table th {
+    background: rgba(255,255,255,0.12);
+    font-weight: 700;
+}
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+.delete-btn {
+    background: #e52165;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.delete-btn:hover {
+    background: #f37021;
+}
+@media (max-width: 700px) {
+    .data-table-container {
+        padding: 15px 5px;
+    }
+    .data-header {
+        font-size: 1.3rem;
+    }
+} 

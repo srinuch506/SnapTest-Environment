@@ -1,0 +1,92 @@
+/* ABC Page Dedicated Styles */
+body {
+    background: linear-gradient(135deg, #1e2a78, #f37021);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.abc-header {
+    background: rgba(255,255,255,0.1);
+    padding: 30px 0 20px 0;
+    text-align: center;
+    color: #fff;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+.abc-content-container {
+    max-width: 700px;
+    margin: 40px auto;
+    background: rgba(255,255,255,0.08);
+    border-radius: 15px;
+    padding: 30px 20px;
+    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.17);
+}
+.abc-content {
+    color: #fff;
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+}
+.abc-btn {
+    background: #f37021;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 20px;
+}
+.abc-btn:hover {
+    background: #e52165;
+}
+@media (max-width: 700px) {
+    .abc-content-container {
+        padding: 15px 5px;
+    }
+    .abc-header {
+        font-size: 1.3rem;
+    }
+}
+
+body {
+    background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+.completion-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    padding: 40px 60px;
+    text-align: center;
+    max-width: 400px;
+}
+
+.completion-container h2 {
+    color: #28a745;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.completion-icon {
+    font-size: 3rem;
+    color: #28a745;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.completion-message {
+    color: #333;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+} 

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapTest System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- Animated Background -->
+    <div class="bg-animation"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav>
+            <div class="nav-container">
+                <a href="{{ url_for('landing') }}" class="logo-link">
+                    <div class="logo-text">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>SnapTest</span>
+                    </div>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('landing') }}">Home</a></li>
+                    <li><a href="{{ url_for('studentlogin') }}">Student Login</a></li>
+                    <li><a href="{{ url_for('adminlogin') }}">Admin Login</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Welcome to SnapTest System</h1>
+            <p>Experience the future of online testing with our advanced, secure, and user-friendly platform. 
+               Take your exams with confidence in a monitored environment designed for academic integrity.</p>
+            
+            <div class="action-cards">
+                <div class="card" onclick="window.location.href='/studentlogin'">
+                    <div class="card-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h3>Student Login</h3>
+                    <p>Access your test portal with secure authentication and real-time monitoring.</p>
+                    <a href="/studentlogin" class="card-btn">Login</a>
+                </div>
+                
+                <div class="card" onclick="window.location.href='/adminlogin'">
+                    <div class="card-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <h3>Admin Portal</h3>
+                    <p>Access the dashboard to manage tests and view student data.</p>
+                    <a href="/adminlogin" class="card-btn">Admin Access</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="features-container">
+            <h2>Why Choose Our SnapTest?</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4>Secure Environment</h4>
+                    <p>Full-screen mode and camera monitoring ensure test integrity</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4>Real-time Analytics</h4>
+                    <p>Instant results and detailed performance analytics</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h4>Responsive Design</h4>
+                    <p>Works seamlessly across all devices and screen sizes</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h4>Fast & Reliable</h4>
+                    <p>Optimized performance for smooth testing experience</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <div class="logo-text">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>SnapTest System</span>
+                    
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="{{ url_for('landing') }}">Home</a></li>
+                    <li><a href="{{ url_for('studentlogin') }}">Student Login</a></li>
+                    <li><a href="{{ url_for('adminlogin') }}">Admin Login</a></li>
+                </ul>
+            </div>
+            <div class="footer-social">
+                <h4>Follow Us</h4>
+                <div class="social-icons">
+                    <a href="https://www.linkedin.com/in/srinuch"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://www.instagram.com/codewithsrinu"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/codewith.srinu"><i class="fab fa-facebook-f"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-social">
+                <h4>Contact Us</h4>
+                <div class="footer-links">
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> srinivasaraoch506@gmail.com</li>
+                        <li><i class="fas fa-phone"></i> +91 9989602184</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 SnapTest System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Optimized loading screen - reduced delay
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+            }, 300); // Reduced from 1000ms to 300ms
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add hover effects to cards
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Optimized typing effect - removed delay
+        function typeWriter(element, text, speed = 50) {
+            let i = 0;
+            element.innerHTML = '';
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        // Initialize typing effect immediately after page loads
+        window.addEventListener('load', function() {
+            const heroTitle = document.querySelector('.hero h1');
+            if (heroTitle) {
+                const originalText = heroTitle.textContent;
+                typeWriter(heroTitle, originalText, 30); // Faster typing speed
+            }
+        });
+
+        // Preload critical resources
+        function preloadResources() {
+            // Preload CSS
+            const link = document.createElement('link');
+            link.rel = 'preload';
+            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
+            link.as = 'style';
+            document.head.appendChild(link);
+        }
+
+        // Call preload function
+        preloadResources();
+    </script>
+</body>
+</html>
