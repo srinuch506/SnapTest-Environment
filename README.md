@@ -2,7 +2,7 @@
 
 A comprehensive, modern web-based test environment built with Flask, featuring a professional admin panel and streamlined student experience.
 
-## 🚀 Features
+## Features
 
 ### **Student Experience**
 - **Simplified Login**: Direct access with Student ID, Name, and Batch
@@ -25,7 +25,7 @@ A comprehensive, modern web-based test environment built with Flask, featuring a
 - **Exit Detection**: Track test exits and disqualifications
 - **Data Protection**: Secure database operations
 
-## 🛠️ Technical Stack
+## Technical Stack
 
 - **Backend**: Flask (Python)
 - **Database**: MySQL with PyMySQL
@@ -55,7 +55,7 @@ Test Environment/
     └── ...               # Other HTML files
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Python 3.7+
@@ -90,7 +90,7 @@ Test Environment/
    - Admin Login: `http://localhost:5000/adminlogin`
    - Home Page: `http://localhost:5000`
 
-## 📋 Usage Guide
+## Usage Guide
 
 ### For Students
 1. Navigate to the student login page
@@ -106,7 +106,7 @@ Test Environment/
 4. Export results as needed
 5. Monitor test progress in real-time
 
-## 🎨 UI/UX Improvements
+## UI/UX Improvements
 
 ### **Modern Design Elements**
 - **Glassmorphism**: Translucent containers with backdrop blur
@@ -129,7 +129,7 @@ Test Environment/
 - **Status Indicators**: Color-coded status badges
 - **Navigation**: Intuitive sidebar menu
 
-## 🔧 Technical Enhancements
+## Technical Enhancements
 
 ### **Backend Improvements**
 - **Error Handling**: Comprehensive exception management
@@ -149,7 +149,7 @@ Test Environment/
 - **Data Export**: Excel file generation with pandas
 - **Content Management**: Dynamic test content storage
 
-## 🔒 Security Features
+## Security Features
 
 ### **Authentication & Authorization**
 - **Admin Login**: Secure credential verification
@@ -163,7 +163,7 @@ Test Environment/
 - **Data Integrity**: Consistent database operations
 - **Access Control**: Role-based access management
 
-## 📊 Data Management
+## Data Management
 
 ### **Student Data**
 - **Registration**: Automatic student record creation
@@ -177,7 +177,7 @@ Test Environment/
 - **Content Management**: Admin interface for updates
 - **Content Validation**: Input verification and sanitization
 
-## 🚀 Future Enhancements
+## Future Enhancements
 
 ### **Planned Features**
 - **Real-time Notifications**: WebSocket integration
@@ -193,7 +193,7 @@ Test Environment/
 - **Monitoring**: Application performance monitoring
 - **Backup Systems**: Automated data backup
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -201,11 +201,11 @@ Test Environment/
 4. Test thoroughly
 5. Submit a pull request
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 📞 Support
+## Support
 
 For support and questions:
 - Create an issue in the repository
